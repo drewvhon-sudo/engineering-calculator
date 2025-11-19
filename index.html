@@ -2,58 +2,23 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Engineering Toolkit</title>
+<title>Engineering Calculator</title>
 <style>
-    body {
-        font-family: Arial;
-        background: #f5f5f5;
-        margin: 0;
-        padding: 20px;
-    }
-    .container {
-        width: 900px;
-        margin: auto;
-        background: white;
-        padding: 20px;
-        border-radius: 10px;
-    }
-    select, input {
-        padding: 8px;
-        margin: 5px;
-        width: 200px;
-    }
-    button {
-        padding: 10px 20px;
-        margin-top: 10px;
-        background: #007BFF;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-    }
+    body { font-family: Arial; background: #f5f5f5; margin: 0; padding: 20px; }
+    .container { width: 900px; margin: auto; background: white; padding: 20px; border-radius: 10px; }
+    select, input { padding: 8px; margin: 5px; width: 200px; }
+    button { padding: 10px 20px; margin-top: 10px; background: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer; }
     button:hover { background: #0056cc; }
-
-    .section-title {
-        font-size: 22px;
-        margin-top: 20px;
-        font-weight: bold;
-    }
-    .result {
-        margin-top: 15px;
-        padding: 15px;
-        background: #e8f0fe;
-        border-radius: 8px;
-        font-weight: bold;
-    }
+    .section-title { font-size: 22px; margin-top: 20px; font-weight: bold; }
+    .result { margin-top: 15px; padding: 15px; background: #e8f0fe; border-radius: 8px; font-weight: bold; }
 </style>
 </head>
 <body>
 
 <div class="container">
 
-<h1>Engineering Toolkit</h1>
+<h1>Engineering Calculator</h1>
 
-<!-- MAIN TABS -->
 <select id="mainMenu" onchange="switchMenu()">
     <option value="conversion">Unit Conversion</option>
     <option value="compute">Mechanical Computation</option>
@@ -172,16 +137,15 @@ function convert() {
         return;
     }
 
-    // Conversion multipliers
     const conv = {
-        Length: {m:1, cm:100, km:0.001, in:39.37, ft:3.28, yd:1.09, mile:0.000621},
-        Weight: {kg:1, g:1000, lb:2.2046, oz:35.274},
+        Length: {m:1, cm:100, km:0.001, in:39.3701, ft:3.28084, yd:1.09361, mile:0.000621371},
+        Weight: {kg:1, g:1000, lb:2.20462, oz:35.274},
         Time: {s:1, min:1/60, hr:1/3600, day:1/86400},
-        Area: {m2:1, cm2:10000, km2:0.000001, acre:0.000247},
-        Volume: {L:1, mL:1000, m3:0.001, cm3:1000, gal:0.264},
-        Pressure:{Pa:1,kPa:0.001,MPa:1e-6,GPa:1e-9,atm:9.869e-6,bar:1e-5,psi:1.450e-4},
-        Energy:{J:1,kJ:0.001,cal:0.239,kcal:0.000239},
-        Speed:{ "m/s":1, "km/h":3.6, "mph":2.2369 }
+        Area: {m2:1, cm2:10000, km2:0.000001, acre:0.000247105},
+        Volume: {L:1, mL:1000, m3:0.001, cm3:1000, gal:0.264172},
+        Pressure: {Pa:1, kPa:0.001, MPa:1e-6, GPa:1e-9, atm:9.869e-6, bar:1e-5, psi:1.45038e-4},
+        Energy: {J:1, kJ:0.001, cal:0.239006, kcal:0.000239006},
+        Speed: {"m/s":1, "km/h":3.6, "mph":2.23694}
     };
 
     let res;
@@ -191,11 +155,10 @@ function convert() {
         else if (from === "F" && to === "C") res = (value - 32) * 5/9;
         else if (from === "C" && to === "K") res = value + 273.15;
         else if (from === "K" && to === "C") res = value - 273.15;
-        else if (from === "F" && to === "K") res = (value - 32)*5/9 + 273.15;
-        else if (from === "K" && to === "F") res = (value - 273.15)*9/5 + 32;
+        else if (from === "F" && to === "K") res = (value - 32) * 5/9 + 273.15;
+        else if (from === "K" && to === "F") res = (value - 273.15) * 9/5 + 32;
         else res = value;
-    } 
-    else {
+    } else {
         res = value * conv[cat][to] / conv[cat][from];
     }
 
@@ -203,28 +166,29 @@ function convert() {
 }
 
 /* ------------------------ COMPUTATION ENGINE ---------------------------- */
+
 function loadInputs() {
     let formula = document.getElementById("computeSelect").value;
     let inputs = document.getElementById("inputs");
 
     const forms = {
-        "F=ma": {labels:["Mass (kg)","Acceleration (m/s²)"], unit:"N"},
-        "T=Fr": {labels:["Force (N)","Radius (m)"], unit:"N·m"},
-        "σ=F/A": {labels:["Force (N)","Area (m²)"], unit:"Pa"},
-        "P=Fv": {labels:["Force (N)","Velocity (m/s)"], unit:"W"},
-        "W=Fd": {labels:["Force (N)","Distance (m)"], unit:"J"},
-        "KE=1/2mv2": {labels:["Mass (kg)","Velocity (m/s)"], unit:"J"},
-        "PE=mgh": {labels:["Mass (kg)","Gravity (m/s²)","Height (m)"], unit:"J"},
-        "a=F/m": {labels:["Force (N)","Mass (kg)"], unit:"m/s²"},
-        "w=v/r": {labels:["Velocity (m/s)","Radius (m)"], unit:"rad/s"},
-        "Fc=mv2/r": {labels:["Mass (kg)","Velocity (m/s)","Radius (m)"], unit:"N"}
+        "F=ma": ["Mass (kg)", "Acceleration (m/s²)"],
+        "T=Fr": ["Force (N)", "Radius (m)"],
+        "σ=F/A": ["Force (N)", "Area (m²)"],
+        "P=Fv": ["Force (N)", "Velocity (m/s)"],
+        "W=Fd": ["Force (N)", "Distance (m)"],
+        "KE=1/2mv2": ["Mass (kg)", "Velocity (m/s)"],
+        "PE=mgh": ["Mass (kg)", "Gravity (m/s²)", "Height (m)"],
+        "a=F/m": ["Force (N)", "Mass (kg)"],
+        "w=v/r": ["Velocity (m/s)", "Radius (m)"],
+        "Fc=mv2/r": ["Mass (kg)", "Velocity (m/s)", "Radius (m)"]
     };
 
     inputs.innerHTML = "<br>";
 
-    forms[formula].labels.forEach((label, i) => {
+    forms[formula].forEach((label, i) => {
         inputs.innerHTML += `<label>${label}:</label>
-                             <input id="input${i}" /><br>`;
+                             <input id="in${i}" /><br>`;
     });
 }
 
@@ -232,39 +196,30 @@ loadInputs();
 
 function compute() {
     let formula = document.getElementById("computeSelect").value;
-    let inputsDiv = document.getElementById("inputs");
-    let inputFields = inputsDiv.querySelectorAll("input");
-    let values = [];
+    let a = parseFloat(document.getElementById("in0")?.value);
+    let b = parseFloat(document.getElementById("in1")?.value);
+    let c = parseFloat(document.getElementById("in2")?.value);
+    let result, unit;
 
-    // Parse all inputs dynamically
-    for (let i = 0; i < inputFields.length; i++) {
-        let val = parseFloat(inputFields[i].value);
-        if (isNaN(val)) {
-            document.getElementById("computeResult").innerHTML = "Please enter valid numbers.";
-            return;
-        }
-        values.push(val);
+    if (isNaN(a) || isNaN(b) || (formula.includes("PE") || formula.includes("Fc") ? isNaN(c) : false)) {
+        document.getElementById("computeResult").innerHTML = "Please enter valid numbers.";
+        return;
     }
 
-    let r = 0;
-    let unit = "";
+    switch(formula){
+        case "F=ma": result = a*b; unit="N"; break;
+        case "T=Fr": result = a*b; unit="Nm"; break;
+        case "σ=F/A": result = a/b; unit="Pa"; break;
+        case "P=Fv": result = a*b; unit="W"; break;
+        case "W=Fd": result = a*b; unit="J"; break;
+        case "KE=1/2mv2": result = 0.5*a*b*b; unit="J"; break;
+        case "PE=mgh": result = a*b*c; unit="J"; break;
+        case "a=F/m": result = a/b; unit="m/s²"; break;
+        case "w=v/r": result = a/b; unit="rad/s"; break;
+        case "Fc=mv2/r": result = a*b*b/c; unit="N"; break;
+    }
 
-    const formulas = {
-        "F=ma": () => { r = values[0]*values[1]; unit="N"; },
-        "T=Fr": () => { r = values[0]*values[1]; unit="N·m"; },
-        "σ=F/A": () => { r = values[0]/values[1]; unit="Pa"; },
-        "P=Fv": () => { r = values[0]*values[1]; unit="W"; },
-        "W=Fd": () => { r = values[0]*values[1]; unit="J"; },
-        "KE=1/2mv2": () => { r = 0.5*values[0]*Math.pow(values[1],2); unit="J"; },
-        "PE=mgh": () => { r = values[0]*values[1]*values[2]; unit="J"; },
-        "a=F/m": () => { r = values[0]/values[1]; unit="m/s²"; },
-        "w=v/r": () => { r = values[0]/values[1]; unit="rad/s"; },
-        "Fc=mv2/r": () => { r = values[0]*Math.pow(values[1],2)/values[2]; unit="N"; }
-    };
-
-    formulas[formula]();
-
-    document.getElementById("computeResult").innerHTML = `Result: <b>${r.toFixed(4)} ${unit}</b>`;
+    document.getElementById("computeResult").innerHTML = `Result: <b>${result.toFixed(4)} ${unit}</b>`;
 }
 </script>
 
